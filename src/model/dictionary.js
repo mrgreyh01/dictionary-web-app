@@ -1,10 +1,11 @@
 export class Dictionary {
 
-  constructor(word, phonetic, audio, meanings) {
+  constructor(word, phonetic, audio, meanings, source) {
     this.word = word;
     this.phonetic = phonetic;
     this.audio = audio;
     this.meanings = meanings;
+    this.source = source;
   }
 
   static fromJSON(apiData) {
@@ -44,9 +45,12 @@ export class Dictionary {
     // This will assign the entire meanings array (or an empty one)
     let meanings = data.meanings || [];
 
-    // --- 4. Create and return the new instance ---
+    // --- 4. Get Source ---
+    let source = data.source || "";
+
+    // --- 5. Create and return the new instance ---
     // Note: Corrected to return 'new Dictinory' instead of 'new User'
-    return new Dictionary(word, phonetic, audio, meanings);
+    return new Dictionary(word, phonetic, audio, meanings, source);
   }
 
   /**

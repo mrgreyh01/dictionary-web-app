@@ -22,13 +22,13 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchKeyword(inputValue);
-    }, 500);
+    }, 1000);
     return () => clearTimeout(timer);
   }, [inputValue]);
 
   useEffect(() => {
 
-    if (!searchKeyword || searchKeyword.trim() === "") {
+    if (!searchKeyword || searchKeyword.trim() === "" || searchKeyword.length < 2) {
       return; 
     }
 
@@ -62,8 +62,7 @@ export default function Home() {
             <Header />
             <Searchbar />
             <Search_keyword />
-            <Noun />
-            <Verb />
+            <Meanings />
             <Source />
           </div>
         </div>
@@ -160,58 +159,62 @@ function Search_keyword() {
   );
 }
 
-function Noun() {
-  return (
-    <div className="flex flex-col gap-4 ">
-      <div className="flex gap-6 items-center">
-        <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white">noun</h2>
-        <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
-      </div>
-      <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
-        <h3 className="text-base text-[#757575]">Meaning</h3>
-        <div className="max-w-full ml-4">
-          <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start space-y-4">
-            <li>(etc.) A set of keys used to operate a typewriter, computer etc.</li>
-            <li>A component of many instruments including the piano, organ, and harpsichord consisting of usually black and white keys that cause different tones to be produced when struck.</li>
-            <li>A device with keys of a musical keyboard, used to control electronic sound-producing devices which may be built into or separate from the keyboard device.</li>
-          </ul>
-        </div>
-      </div>
-      <div className="flex text-base gap-6">
-        <h3 className="text-[#757575]">Synonyms</h3>
-        <p className="font-bold text-[#a445ed]">electronic keyboard</p>
-      </div>
-    </div>
-  );
-}
+function Meanings() {
+  const { searchData } = useContext(SearchDataContext);
 
-function Verb() {
+  if (!searchData || !searchData.meanings || searchData.meanings.length === 0) {
+    return null;
+  }
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-6 items-center">
-        <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white">verb</h2>
-        <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
-      </div>
-      <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
-        <h3 className="text-base text-[#757575]">Meaning</h3>
-        <div className="w-full ml-4">
-          <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start flex flex-col gap-4">
-            <li>To type on a computer keyboard.</li>
-            <span className="text-[#757575]">“Keyboarding is the part of this job I hate the most.”</span>
-          </ul>
+    <>
+      {searchData.meanings.map((meaning, index) => (
+        <div key={index} className="flex flex-col gap-4 mt-6">
+          <div className="flex gap-6 items-center">
+            <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white italic">{meaning.partOfSpeech}</h2>
+            <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
+          </div>
+          <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
+            <h3 className="text-base text-[#757575]">Meaning</h3>
+            <div className="max-w-full ml-4">
+              <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start flex flex-col gap-4">
+                {meaning.definitions.map((def, idx) => (
+                  <li key={idx}>
+                    {def.definition}
+                    {def.example && (
+                      <span className="text-[#757575] block mt-1">“{def.example}”</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          {meaning.synonyms && meaning.synonyms.length > 0 && (
+            <div className="flex text-base gap-6 flex-wrap">
+              <h3 className="text-[#757575]">Synonyms</h3>
+              {meaning.synonyms.map((syn, idx) => (
+                <p key={idx} className="font-bold text-[#a445ed]">{syn}</p>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-      <div className="mt-4 h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
-    </div>
+      ))}
+    </>
   );
 }
 
 function Source() {
+  const { searchData } = useContext(SearchDataContext);
+
+  if (!searchData || !searchData.source || searchData.source.length === 0) {
+    return null;
+  }
+
   return (
     <div className="flex flex-col text-sm gap-2">
       <h3 className="underline decoration-[#757575] underline-offset-2 text-[#757575]">Source</h3>
       <div className="flex text-[#2d2d2d] gap-2">
-       <a className="underline decoration-[#757575] underline-offset-2 dark:text-white" href="http://https://en.wiktionary.org/wiki/keyboard" target="_blank">https://en.wiktionary.org/wiki/keyboard</a>
+       <a className="underline decoration-[#757575] underline-offset-2 dark:text-white" href={searchData.source} target="_blank">{searchData.source}</a>
        <img src="/images/icon-new-window.svg" alt="" />
       </div>
     </div>
@@ -261,6 +264,90 @@ function Toggle() {
 
           </div>
       </label>
+    </div>
+  );
+}
+
+function Verb() {
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex gap-6 items-center">
+        <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white">verb</h2>
+        <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
+      </div>
+      <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
+        <h3 className="text-base text-[#757575]">Meaning</h3>
+        <div className="w-full ml-4">
+          <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start flex flex-col gap-4">
+            <li>To type on a computer keyboard.</li>
+            <span className="text-[#757575]">“Keyboarding is the part of this job I hate the most.”</span>
+          </ul>
+        </div>
+      </div>
+      <div className="flex flex-col text-base gap-4">
+        <h3 className="text-[#757575]">Synonyms</h3>
+        <div className="flex flex-wrap gap-6 space-y-[-16px]">
+        <p className="font-bold text-[#a445ed]">electronic keyboard</p>
+        <p className="font-bold text-[#a445ed]">operator</p>
+        <p className="font-bold text-[#a445ed]">Yellow Pages</p>
+        <p className="font-bold text-[#a445ed]">type</p>
+        <p className="font-bold text-[#a445ed]">type</p>
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p>    
+        <p className="font-bold text-[#a445ed]">type</p> 
+        <p className="font-bold text-[#a445ed]">type</p>    
+
+        </div>
+
+
+
+      </div>
+      <div className="mt-4 h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
+    </div>
+  );
+}
+
+function Noun() {
+  return (
+    <div className="flex flex-col gap-4 ">
+      <div className="flex gap-6 items-center">
+        <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white">noun</h2>
+        <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
+      </div>
+      <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
+        <h3 className="text-base text-[#757575]">Meaning</h3>
+        <div className="max-w-full ml-4">
+          {/* <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start space-y-4">
+            <li>(etc.) A set of keys used to operate a typewriter, computer etc.</li>
+            <li>A component of many instruments including the piano, organ, and harpsichord consisting of usually black and white keys that cause different tones to be produced when struck.</li>
+            <li>A device with keys of a musical keyboard, used to control electronic sound-producing devices which may be built into or separate from the keyboard device.</li>
+          </ul> */}
+          
+          <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start flex flex-col gap-4">
+            <li>To type on a computer keyboard.</li>
+            <li>To type on a computer keyboard.</li>
+
+            <span className="text-[#757575]">“Keyboarding is the part of this job I hate the most.”</span>
+          </ul>
+        </div>
+      </div>
+      <div className="flex text-base gap-6">
+        <h3 className="text-[#757575]">Synonyms</h3>
+        <p className="font-bold text-[#a445ed]">electronic keyboard</p>
+        <p className="font-bold text-[#a445ed]">Yellow Pages</p>
+        <p className="font-bold text-[#a445ed]">Yellow Pages</p>
+        <p className="font-bold text-[#a445ed]">Yellow Pages</p>
+
+      </div>
     </div>
   );
 }
