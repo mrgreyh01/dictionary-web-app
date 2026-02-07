@@ -46,7 +46,7 @@ export class Dictionary {
     let meanings = data.meanings || [];
 
     // --- 4. Get Source ---
-    let source = data.source || "";
+    let source = data.sourceUrls || "";
 
     // --- 5. Create and return the new instance ---
     // Note: Corrected to return 'new Dictinory' instead of 'new User'

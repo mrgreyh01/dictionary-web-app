@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-// import { MouseEventHandler } from "react";
 import { useState, useEffect  } from 'react';
 import { createContext, useContext } from 'react';
 import  {Dictionary}  from '../model/dictionary.js';
@@ -9,10 +7,12 @@ import  {Dictionary}  from '../model/dictionary.js';
 const SearchContext = createContext();
 const SearchDataContext = createContext();
 const InputContext = createContext();
+const FontContext = createContext();
 
 
 export default function Home() {
 
+  const [selectedFont, setSelectedFont] = useState({"fontName":"font-sans", "fontFamily":"Sans-Serif"});
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -53,12 +53,13 @@ export default function Home() {
   }, [searchKeyword]);
 
   return (
+    <FontContext.Provider value={{ selectedFont, setSelectedFont }}>  
     <InputContext.Provider value={{ inputValue, setInputValue }}>
     <SearchContext.Provider value={{ searchKeyword, setSearchKeyword,  }}>
     <SearchDataContext.Provider value={{ searchData, setSearchData }}>  
       <>
         <div className="min-h-screen bg-white dark:bg-[#050505] flex items-center justify-center">
-          <div className="flex flex-col w-full h-full min-w-[365px] min-h-[1065] max-w-[1088px] max-h-[1205px] p-6 gap-8">
+          <div className={` ${selectedFont.fontName} flex flex-col w-full h-full min-w-[365px] min-h-[1065] max-w-[1088px] max-h-[1205px] p-6 gap-8`}>
             <Header />
             <Searchbar />
             <Search_keyword />
@@ -70,6 +71,7 @@ export default function Home() {
     </SearchDataContext.Provider>
     </SearchContext.Provider>
     </InputContext.Provider>
+    </FontContext.Provider>
   );  
 }
 
@@ -126,15 +128,15 @@ function Search_keyword() {
   const { searchData } = useContext(SearchDataContext);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const playAudio = () => {
+  const playAudio = async () => {
     const audio = new Audio(searchData.audio);
-    if (isPlaying) {
-      audio.pause();
+    await audio.play();
+    setIsPlaying(true);
+    setTimeout(() => {
       setIsPlaying(false);
-    } else {
-      audio.play();
-      setIsPlaying(true);
-    }
+      audio.pause();
+    }, 1600);
+    
   };
 
   return (
@@ -182,7 +184,7 @@ function Meanings() {
                   <li key={idx}>
                     {def.definition}
                     {def.example && (
-                      <span className="text-[#757575] block mt-1">“{def.example}”</span>
+                      <span className="text-[#757575] block mt-3 ">“{def.example}”</span>
                     )}
                   </li>
                 ))}
@@ -211,7 +213,7 @@ function Source() {
   }
 
   return (
-    <div className="flex flex-col text-sm gap-2">
+    <div className="flex flex-col text-sm gap-4">
       <h3 className="underline decoration-[#757575] underline-offset-2 text-[#757575]">Source</h3>
       <div className="flex text-[#2d2d2d] gap-2">
        <a className="underline decoration-[#757575] underline-offset-2 dark:text-white" href={searchData.source} target="_blank">{searchData.source}</a>
@@ -222,17 +224,35 @@ function Source() {
 }
 
 function Dropdown() {
+
+  const [isOpen, setIsOpen] = useState(false);
+  const { selectedFont, setSelectedFont } = useContext(FontContext);
+
   return (
-          <div className="flex gap-4">
-            <span className="text-[14px] text-white font-bold whitespace-nowrap">Sans Serif</span>
-            <button>
-              <img className="w-full h-full" src="images/icon-arrow-down.svg" alt="" />
-            </button>            
-            <ul className="hidden">
-              <button><li>Sans Serif</li></button>
-              <button><li>Serif</li></button>
-              <button><li>Mono</li></button>
-            </ul>
+          <div className="flex gap-4 relative">
+            <span className="text-[14px] text-white font-bold whitespace-nowrap">{selectedFont.fontFamily}</span>
+            <button className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+              {isOpen && (
+                <img className="w-full h-full rotate-180" src="images/icon-arrow-down.svg" alt="" />
+              )}
+              {!isOpen && (
+                <img className="w-full h-full" src="images/icon-arrow-down.svg" alt="" />
+              )}  
+            </button>  
+
+            {isOpen && (
+                <>
+                  <div 
+                    className="fixed inset-0 z-5" 
+                    onClick={() => setIsOpen(false)} 
+                  /> 
+                  <ul className="flex flex-col items-start gap-5  absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_10px] shadow-[#a445ed] bg-black dark:text-white">
+                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className="cursor-pointer">Sans Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="cursor-pointer">Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="cursor-pointer">Mono</li></button>
+                  </ul>
+                </>
+            )}
           </div>
   );
 }
