@@ -17,7 +17,8 @@ export default function Home() {
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [searchData, setSearchData] = useState([]);
+  const [searchData, setSearchData] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const serverUrl = 'https://api.dictionaryapi.dev/api/v2/entries/en/';
 
   useEffect(() => {
@@ -34,6 +35,7 @@ export default function Home() {
     }
 
     const fetchData = async () => {
+      setIsLoading(true);
       try {
         const fullUrl = `${serverUrl}${encodeURIComponent(searchKeyword)}`;
         const response = await fetch(fullUrl);
@@ -41,12 +43,17 @@ export default function Home() {
         const apiData = Dictionary.fromJSON(data);
         if(apiData !== null) {
           setSearchData(apiData);          
+        } else {
+          setSearchData(null);
         }
-        console.log("Model:",apiData);
+        console.log("Model:",searchData);
         
         
       } catch (error) {
         console.error('Error fetching data:', error);
+        setSearchData(null);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -65,9 +72,16 @@ export default function Home() {
           <div className={` ${selectedFont.fontName} flex flex-col w-full min-w-[365px] max-w-[1088px] p-6 gap-8`}>
             <Header />
             <Searchbar />
-            <Search_keyword />
-            <Meanings />
-            <Source />
+            {!isLoading && searchData !== null && searchKeyword.length >= 2 && (
+              <>
+                <Search_keyword />
+                <Meanings />
+                <Source />
+              </>
+            )}
+            {!isLoading && (searchData === null || searchData.length <= 0) && searchKeyword.length >= 2 && (
+              <NoDefinitionFound />
+            )}
           </div>
         </div>
       </>
@@ -102,7 +116,6 @@ function Header() {
 
 function Searchbar() {
 
-  const { searchKeyword,  setSearchKeyword } = useContext(SearchContext);
   const { inputValue, setInputValue } = useContext(InputContext);
   const { isDarkMode } = useContext(ModeContext);
 
@@ -303,6 +316,17 @@ function Toggle() {
 
           </div>
       </label>
+    </div>
+  );
+}
+
+function NoDefinitionFound() {
+  const { isDarkMode } = useContext(ModeContext);
+  return (
+    <div className="flex flex-col items-center text-center gap-6 mt-24">
+      <img src="/images/emoji.png" alt="" />
+      <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-black"} mt-2`}>No Definitions Found</h2>
+      <p className={`text-base text-[#757575] max-w-[625px]`}>Sorry pal, we couldn't find definitions for the word you were looking for. You can try the search again at later time or head to the web instead.</p>
     </div>
   );
 }
