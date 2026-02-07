@@ -8,6 +8,7 @@ const SearchContext = createContext();
 const SearchDataContext = createContext();
 const InputContext = createContext();
 const FontContext = createContext();
+const ModeContext = createContext();
 
 
 export default function Home() {
@@ -43,6 +44,7 @@ export default function Home() {
         }
         console.log("Model:",apiData);
         
+        
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -53,13 +55,14 @@ export default function Home() {
   }, [searchKeyword]);
 
   return (
+    <ModeContext.Provider value={{ isDarkMode, setIsDarkMode }}>
     <FontContext.Provider value={{ selectedFont, setSelectedFont }}>  
     <InputContext.Provider value={{ inputValue, setInputValue }}>
     <SearchContext.Provider value={{ searchKeyword, setSearchKeyword,  }}>
     <SearchDataContext.Provider value={{ searchData, setSearchData }}>  
       <>
-        <div className="min-h-screen bg-white dark:bg-[#050505] flex items-center justify-center">
-          <div className={` ${selectedFont.fontName} flex flex-col w-full h-full min-w-[365px] min-h-[1065] max-w-[1088px] max-h-[1205px] p-6 gap-8`}>
+        <div className={` ${isDarkMode ? "bg-[#050505]" : "bg-white"} min-h-screen flex items-start justify-center`}>
+          <div className={` ${selectedFont.fontName} flex flex-col w-full min-w-[365px] max-w-[1088px] p-6 gap-8`}>
             <Header />
             <Searchbar />
             <Search_keyword />
@@ -72,21 +75,25 @@ export default function Home() {
     </SearchContext.Provider>
     </InputContext.Provider>
     </FontContext.Provider>
+    </ModeContext.Provider>
   );  
 }
 
 // header component
 function Header() {
+
+  const { isDarkMode } = useContext(ModeContext);
+
   return (
-    <div className="flex items-center justify-between gap-20  text-black md:pt-8">
+    <div className={`flex items-center justify-between gap-20 ${isDarkMode ? "text-white" : "text-black"} md:pt-8`}>
       <img className="h-fit w-fit font-bold " src="images/logo.svg" alt="" />
       <div className="flex items-center justify-center gap-4">
         <Dropdown />
-        <div className="h-[34px] w-[2px] bg-gray-200 dark:bg-[#e9e9e9]"></div>
+        <div className={`h-[34px] w-[2px] bg-gray-200 ${isDarkMode ? "bg-[#e9e9e9]" : ""}`}></div>
         <div className="flex gap-3">
           <Toggle />
-          <img className="w-[24px] h-[24px] dark:hidden" src="images/icon-moon.svg" alt="" />
-          <img className="w-[24px] h-[24px] hidden dark:block" src="images/dark-moon.png" alt="" />
+          <img className={`w-[24px] h-[24px] ${isDarkMode ? "hidden" : ""}`} src="images/icon-moon.svg" alt="" />
+          <img className={`w-[24px] h-[24px] ${isDarkMode ? "" : "hidden"}`} src="images/dark-moon.png" alt="" />
         </div>
       </div>
     </div>
@@ -97,15 +104,17 @@ function Searchbar() {
 
   const { searchKeyword,  setSearchKeyword } = useContext(SearchContext);
   const { inputValue, setInputValue } = useContext(InputContext);
+  const { isDarkMode } = useContext(ModeContext);
+
 
   return (
     <div className="flex">
       <div className="relative w-full h-12"> 
-        <input placeholder="search" type="search" id="search-bar" className="flex justify-end items-center w-full h-full bg-[#f4f4f4] dark:bg-[#1f1f1f] rounded-xl px-6 text-[#2d2d2d] dark:text-white font-bold shadow-base focus:outline-none focus:ring-2 focus:ring-[#a445ed]
+        <input placeholder="search" type="search" id="search-bar" className={`flex justify-end items-center w-full h-full  ${isDarkMode ? "bg-[#1f1f1f]" : "bg-[#f4f4f4]"} rounded-xl px-6 ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} font-bold shadow-base focus:outline-none focus:ring-2 focus:ring-[#a445ed]
         
-        ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none " value={inputValue} onChange={(e) => {
+        ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none `} value={inputValue} onChange={(e) => {
           setInputValue(e.target.value);
-        }} />
+}}/>
 
         <label htmlFor="search-bar" className="absolute right-0 top-0 h-full flex items-center justify-center px-6 cursor-pointer" >
             { (inputValue === '') ? (
@@ -127,6 +136,8 @@ function Searchbar() {
 function Search_keyword() {
   const { searchData } = useContext(SearchDataContext);
   const [isPlaying, setIsPlaying] = useState(false);
+  const { isDarkMode } = useContext(ModeContext);
+
 
   const playAudio = async () => {
     const audio = new Audio(searchData.audio);
@@ -142,9 +153,9 @@ function Search_keyword() {
   return (
     <div className="flex justify-between items-center">
       <div className="flex flex-col justify-start gap-1">
-        <h1 className="text-3xl lg:text-5xl font-bold text-[#2d2d2d] dark:text-white">{searchData.word}</h1>
+        <h1 className={`text-3xl lg:text-5xl font-bold ${isDarkMode ? "text-white" : "text-[#2d2d2d]"}`}>{searchData.word}</h1>
         <h3 className="text-xl lg:text-2xl text-[#a445ed]">{searchData.phonetic}</h3>
-      </div>
+      </div>                  
       <div>
         {searchData.audio && (
           <button onClick={playAudio}>
@@ -163,6 +174,8 @@ function Search_keyword() {
 
 function Meanings() {
   const { searchData } = useContext(SearchDataContext);
+  const { isDarkMode } = useContext(ModeContext);
+
 
   if (!searchData || !searchData.meanings || searchData.meanings.length === 0) {
     return null;
@@ -171,20 +184,20 @@ function Meanings() {
   return (
     <>
       {searchData.meanings.map((meaning, index) => (
-        <div key={index} className="flex flex-col gap-4 mt-6">
+        <div key={index} className="flex flex-col gap-4 mt-2">
           <div className="flex gap-6 items-center">
-            <h2 className="text-lg font-bold text-[#2d2d2d] dark:text-white italic">{meaning.partOfSpeech}</h2>
-            <div className="h-[2px] w-full bg-[#e9e9e9] dark:bg-[#3a3a3a]"></div>
+            <h2 className={`text-lg font-bold ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} italic`}>{meaning.partOfSpeech}</h2>
+            <div className={`h-[2px] w-full ${isDarkMode ? "bg-[#3a3a3a]" : "bg-[#e9e9e9]"}`}></div>
           </div>
           <div className="flex flex-col text-[#2d2d2d] gap-4 text-[15px]">
-            <h3 className="text-base text-[#757575]">Meaning</h3>
+            <h3 className={`text-base ${isDarkMode ? "text-[#A0A0A0]" : "text-[#757575]"}`}>Meaning</h3>
             <div className="max-w-full ml-4">
-              <ul className="list-outside list-disc marker:text-[#8f19e8] dark:text-white text-start flex flex-col gap-4">
+              <ul className={`list-outside list-disc marker:text-[#8f19e8] ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} text-start flex flex-col gap-4`}>
                 {meaning.definitions.map((def, idx) => (
                   <li key={idx}>
                     {def.definition}
                     {def.example && (
-                      <span className="text-[#757575] block mt-3 ">“{def.example}”</span>
+                      <span className={`block mt-3 ${isDarkMode ? "text-[#A0A0A0]" : "text-[#757575]"}`}>“{def.example}”</span>
                     )}
                   </li>
                 ))}
@@ -193,7 +206,7 @@ function Meanings() {
           </div>
           {meaning.synonyms && meaning.synonyms.length > 0 && (
             <div className="flex text-base gap-6 flex-wrap">
-              <h3 className="text-[#757575]">Synonyms</h3>
+              <h3 className={` ${isDarkMode ? "text-[#A0A0A0]" : "text-[#757575]"}`}>Synonyms</h3>
               {meaning.synonyms.map((syn, idx) => (
                 <p key={idx} className="font-bold text-[#a445ed]">{syn}</p>
               ))}
@@ -207,16 +220,18 @@ function Meanings() {
 
 function Source() {
   const { searchData } = useContext(SearchDataContext);
+  const { isDarkMode } = useContext(ModeContext);
+
 
   if (!searchData || !searchData.source || searchData.source.length === 0) {
     return null;
   }
 
   return (
-    <div className="flex flex-col text-sm gap-4">
-      <h3 className="underline decoration-[#757575] underline-offset-2 text-[#757575]">Source</h3>
+    <div className="flex flex-col text-sm gap-3">
+      <h3 className={`underline decoration-[#757575] underline-offset-2 ${isDarkMode ? "text-[#A0A0A0]" : "text-[#757575]"}`}>Source</h3>
       <div className="flex text-[#2d2d2d] gap-2">
-       <a className="underline decoration-[#757575] underline-offset-2 dark:text-white" href={searchData.source} target="_blank">{searchData.source}</a>
+       <a className={`underline decoration-[#757575] underline-offset-2 ${isDarkMode ? "text-[#a445ed]" : "text-[#2d2d2d]"}`} href={searchData.source} target="_blank">{searchData.source}</a>
        <img src="/images/icon-new-window.svg" alt="" />
       </div>
     </div>
@@ -227,10 +242,12 @@ function Dropdown() {
 
   const [isOpen, setIsOpen] = useState(false);
   const { selectedFont, setSelectedFont } = useContext(FontContext);
+  const { isDarkMode } = useContext(ModeContext);
+
 
   return (
           <div className="flex gap-4 relative">
-            <span className="text-[14px] text-white font-bold whitespace-nowrap">{selectedFont.fontFamily}</span>
+            <span className={`text-[14px] ${isDarkMode ? "text-white" : "text-black"} font-bold whitespace-nowrap`}>{selectedFont.fontFamily}</span>
             <button className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
               {isOpen && (
                 <img className="w-full h-full rotate-180" src="images/icon-arrow-down.svg" alt="" />
@@ -246,10 +263,10 @@ function Dropdown() {
                     className="fixed inset-0 z-5" 
                     onClick={() => setIsOpen(false)} 
                   /> 
-                  <ul className="flex flex-col items-start gap-5  absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_10px] shadow-[#a445ed] bg-black dark:text-white">
-                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className="cursor-pointer">Sans Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="cursor-pointer">Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="cursor-pointer">Mono</li></button>
+                  <ul className={`flex flex-col items-start gap-5 absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_10px] shadow-[#a445ed] ${isDarkMode ? "bg-black" : "bg-white"} ${isDarkMode ? "text-white"  : "text-black"}`}>
+                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Sans Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Mono</li></button>
                   </ul>
                 </>
             )}
@@ -258,10 +275,12 @@ function Dropdown() {
 }
 
 function Toggle() {
+  const { isDarkMode, setIsDarkMode } = useContext(ModeContext);
+
   return (
     <div className="flex items-center">
       <label className="inline-flex items-center cursor-pointer">
-        <input type="checkbox" value="" className="sr-only peer" />
+        <input type="checkbox" value="" className="sr-only peer" onChange={() => setIsDarkMode(!isDarkMode)} />
         <div className="
           relative w-[44px] h-[22px]
         bg-[#757575]
