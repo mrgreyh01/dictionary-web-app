@@ -105,7 +105,7 @@ function Header() {
       <img className="h-fit w-fit font-bold " src="./images/logo.svg" alt="" />
       <div className="flex items-center justify-center gap-4">
         <Dropdown />
-        <div className={`h-[34px] w-[2px] bg-gray-200 ${isDarkMode ? "bg-[#e9e9e9]" : ""}`}></div>
+        <div className={`ml-2 md:ml-0 h-[34px] w-[2px] bg-gray-200 ${isDarkMode ? "bg-[#e9e9e9]" : ""}`}></div>
         <div className="flex gap-3">
           <Toggle />
           <img className={`w-[24px] h-[24px] ${isDarkMode ? "hidden" : ""}`} src="images/icon-moon.svg" alt="" />
