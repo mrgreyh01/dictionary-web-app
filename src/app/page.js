@@ -265,10 +265,10 @@ function Dropdown() {
               <span className={`text-[14px] ${isDarkMode ? "text-white" : "text-black"} font-bold whitespace-nowrap`}>{selectedFont.fontFamily}</span>
 
               {isOpen && (
-                <img className="w-fit h-fit rotate-180" src="images/icon-arrow-down.svg" alt="" />
+                <img className="w-fit h-fit rotate-180" src="./images/icon-arrow-down.svg" alt="" />
               )}
               {!isOpen && (
-                <img className="w-fit h-fit" src="images/icon-arrow-down.svg" alt="" />
+                <img className="w-fit h-fit" src="./images/icon-arrow-down.svg" alt="" />
               )}  
             </button>  
 
@@ -326,7 +326,7 @@ function NoDefinitionFound() {
   const { isDarkMode } = useContext(ModeContext);
   return (
     <div className="flex flex-col items-center text-center gap-6 mt-24">
-      <img src="/images/emoji.png" alt="" />
+      <img src="./images/emoji.png" alt="" />
       <h2 className={`text-xl font-bold ${isDarkMode ? "text-white" : "text-black"} mt-2`}>No Definitions Found</h2>
       <p className={`text-base text-[#757575] max-w-[625px]`}>Sorry pal, we couldn't find definitions for the word you were looking for. You can try the search again at later time or head to the web instead.</p>
     </div>
