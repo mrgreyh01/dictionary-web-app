@@ -128,7 +128,11 @@ function Searchbar() {
         
         ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none `} value={inputValue} onChange={(e) => {
           setInputValue(e.target.value);
-}}/>
+}} onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      e.currentTarget.blur(); // This dismisses the mobile keyboard
+    }
+  }}/>
 
         <label htmlFor="search-bar" className="absolute right-0 top-0 h-full flex items-center justify-center px-6 cursor-pointer" >
             { (inputValue === '') ? (
