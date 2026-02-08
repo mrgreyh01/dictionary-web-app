@@ -125,7 +125,7 @@ function Searchbar() {
   return (
     <div className="flex">
       <div className="relative w-full h-12"> 
-        <input placeholder="search" type="search" id="search-bar" className={`flex justify-end items-center w-full h-full  ${isDarkMode ? "bg-[#1f1f1f]" : "bg-[#f4f4f4]"} rounded-xl px-6 ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} font-bold shadow-base focus:outline-none focus:border-transparent border-none focus:ring-2 focus:ring-[#a445ed]
+        <input placeholder="Search for any word..." type="search" id="search-bar" className={`flex justify-end items-center w-full h-full  ${isDarkMode ? "bg-[#1f1f1f]" : "bg-[#f4f4f4]"} rounded-xl px-6 ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} font-bold shadow-base focus:outline-none focus:border-transparent border-none focus:ring-2 focus:ring-[#a445ed]
         
         ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none `} value={inputValue} onChange={(e) => {
           setInputValue(e.target.value);
@@ -279,10 +279,16 @@ function Dropdown() {
                     className="fixed inset-0 z-5" 
                     onClick={() => setIsOpen(false)} 
                   /> 
-                  <ul className={`flex flex-col items-start gap-5 absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_0px] shadow-[#a445ed] ${isDarkMode ? "bg-[#1f1f1f]" : "bg-white"} ${isDarkMode ? "text-white"  : "text-black"}`}>
-                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className=" font-sans cursor-pointer hover:text-[#a445ed]">Sans Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="font-serif cursor-pointer hover:text-[#a445ed]">Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="font-mono cursor-pointer hover:text-[#a445ed]">Mono</li></button>
+                  <ul className={`flex flex-col gap-4 absolute w-40 py-4 px-6 rounded-2xl shadow-[0_5px_30px_0px_rgba(0,0,0,0.1)] shadow-[#a445ed] ${isDarkMode ? "bg-[#1f1f1f]" : "bg-white"} ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} z-10 right-0 top-10`}>
+                    <li className="font-sans hover:text-[#a445ed] w-full">
+                      <button className="w-full text-left cursor-pointer font-bold" onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans Serif"}); setIsOpen(false); }}>Sans Serif</button>
+                    </li>
+                    <li className="font-serif hover:text-[#a445ed] w-full">
+                      <button className="w-full text-left cursor-pointer font-bold" onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}>Serif</button>
+                    </li>
+                    <li className="font-mono hover:text-[#a445ed] w-full">
+                      <button className="w-full text-left cursor-pointer font-bold" onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}>Mono</button>
+                    </li>
                   </ul>
                 </>
             )}
@@ -291,12 +297,25 @@ function Dropdown() {
 }
 
 function Toggle() {
+
   const { isDarkMode, setIsDarkMode } = useContext(ModeContext);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (mediaQuery.matches) {
+      setIsDarkMode(true);
+    }
+  }, [setIsDarkMode]);
 
   return (
     <div className="flex items-center">
       <label className="inline-flex items-center cursor-pointer">
-        <input type="checkbox" value="" className="sr-only peer" onChange={() => setIsDarkMode(!isDarkMode)} />
+        <input 
+          type="checkbox" 
+          className="sr-only peer" 
+          checked={isDarkMode}
+          onChange={() => setIsDarkMode(!isDarkMode)} 
+        />
         <div className="
           relative w-[44px] h-[22px]
         bg-[#757575]
