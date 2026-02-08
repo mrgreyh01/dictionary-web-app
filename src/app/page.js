@@ -24,18 +24,19 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       setSearchKeyword(inputValue);
-    }, 1000);
+    }, 850);
     return () => clearTimeout(timer);
   }, [inputValue]);
 
   useEffect(() => {
+    
+    setIsLoading(true);
 
     if (!searchKeyword || searchKeyword.trim() === "" || searchKeyword.length < 2) {
       return; 
     }
 
     const fetchData = async () => {
-      setIsLoading(true);
       try {
         const fullUrl = `${serverUrl}${encodeURIComponent(searchKeyword)}`;
         const response = await fetch(fullUrl);
@@ -100,7 +101,7 @@ function Header() {
 
   return (
     <div className={`flex items-center justify-between gap-20 ${isDarkMode ? "text-white" : "text-black"} md:pt-8`}>
-      <img className="h-fit w-fit font-bold " src="images/logo.svg" alt="" />
+      <img className="h-fit w-fit font-bold " src="./images/logo.svg" alt="" />
       <div className="flex items-center justify-center gap-4">
         <Dropdown />
         <div className={`h-[34px] w-[2px] bg-gray-200 ${isDarkMode ? "bg-[#e9e9e9]" : ""}`}></div>
@@ -123,7 +124,7 @@ function Searchbar() {
   return (
     <div className="flex">
       <div className="relative w-full h-12"> 
-        <input placeholder="search" type="search" id="search-bar" className={`flex justify-end items-center w-full h-full  ${isDarkMode ? "bg-[#1f1f1f]" : "bg-[#f4f4f4]"} rounded-xl px-6 ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} font-bold shadow-base focus:outline-none focus:ring-2 focus:ring-[#a445ed]
+        <input placeholder="search" type="search" id="search-bar" className={`flex justify-end items-center w-full h-full  ${isDarkMode ? "bg-[#1f1f1f]" : "bg-[#f4f4f4]"} rounded-xl px-6 ${isDarkMode ? "text-white" : "text-[#2d2d2d]"} font-bold shadow-base focus:outline-none focus:border-transparent border-none focus:ring-2 focus:ring-[#a445ed]
         
         ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none `} value={inputValue} onChange={(e) => {
           setInputValue(e.target.value);
@@ -132,11 +133,11 @@ function Searchbar() {
         <label htmlFor="search-bar" className="absolute right-0 top-0 h-full flex items-center justify-center px-6 cursor-pointer" >
             { (inputValue === '') ? (
             <button className="h-5 w-5" readOnly>
-              <img className="w-full h-full" src="/images/icon-search.svg" alt="Search" />
+              <img className="w-full h-full" src="./images/icon-search.svg" alt="Search" />
             </button>
           ) : (
             <button className="h-7 w-7" onClick={() => setInputValue('')}>
-              <img className="w-full h-full cursor-pointer" src="/images/icon-cross.png" alt="cut" />
+              <img className="w-full h-full cursor-pointer" src="./images/icon-cross.png" alt="cut" />
             </button>
           )}
         </label>
@@ -174,8 +175,8 @@ function Search_keyword() {
           <button onClick={playAudio}>
             <div className="">
               {isPlaying 
-                ? <img className="flex w-12 h-12 lg:w-15 lg:h-15 cursor-pointer" src="/images/icon-play-active.svg" alt="" />
-                : <img className="w-12 h-12 lg:w-15 lg:h-15 cursor-pointer" src="/images/icon-play.svg" alt="" />
+                ? <img className="flex w-12 h-12 lg:w-15 lg:h-15 cursor-pointer" src="./images/icon-play-active.svg" alt="" />
+                : <img className="w-12 h-12 lg:w-15 lg:h-15 cursor-pointer" src="./images/icon-play.svg" alt="" />
               }
             </div>
           </button>
@@ -260,13 +261,14 @@ function Dropdown() {
 
   return (
           <div className="flex gap-4 relative">
-            <span className={`text-[14px] ${isDarkMode ? "text-white" : "text-black"} font-bold whitespace-nowrap`}>{selectedFont.fontFamily}</span>
-            <button className="cursor-pointer" onClick={() => setIsOpen(!isOpen)}>
+            <button className="cursor-pointer flex gap-4 items-center" onClick={() => setIsOpen(!isOpen)}>
+              <span className={`text-[14px] ${isDarkMode ? "text-white" : "text-black"} font-bold whitespace-nowrap`}>{selectedFont.fontFamily}</span>
+
               {isOpen && (
-                <img className="w-full h-full rotate-180" src="images/icon-arrow-down.svg" alt="" />
+                <img className="w-fit h-fit rotate-180" src="images/icon-arrow-down.svg" alt="" />
               )}
               {!isOpen && (
-                <img className="w-full h-full" src="images/icon-arrow-down.svg" alt="" />
+                <img className="w-fit h-fit" src="images/icon-arrow-down.svg" alt="" />
               )}  
             </button>  
 
@@ -276,10 +278,10 @@ function Dropdown() {
                     className="fixed inset-0 z-5" 
                     onClick={() => setIsOpen(false)} 
                   /> 
-                  <ul className={`flex flex-col items-start gap-5 absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_10px] shadow-[#a445ed] ${isDarkMode ? "bg-black" : "bg-white"} ${isDarkMode ? "text-white"  : "text-black"}`}>
-                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Sans Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Serif</li></button>
-                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="cursor-pointer hover:text-[#a445ed]">Mono</li></button>
+                  <ul className={`flex flex-col items-start gap-5 absolute size-36 font-sans z-10 right-0 top-10 p-4 rounded-lg shadow-[0_0_30px_0px] shadow-[#a445ed] ${isDarkMode ? "bg-[#1f1f1f]" : "bg-white"} ${isDarkMode ? "text-white"  : "text-black"}`}>
+                    <button onClick={() => { setSelectedFont({fontName:"font-sans", fontFamily:"Sans-Serif"}); setIsOpen(false); }}><li className=" font-sans cursor-pointer hover:text-[#a445ed]">Sans Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-serif", fontFamily:"Serif"}); setIsOpen(false); }}><li className="font-serif cursor-pointer hover:text-[#a445ed]">Serif</li></button>
+                    <button onClick={() => { setSelectedFont({fontName:"font-mono", fontFamily:"Mono"}); setIsOpen(false); }}><li className="font-mono cursor-pointer hover:text-[#a445ed]">Mono</li></button>
                   </ul>
                 </>
             )}
