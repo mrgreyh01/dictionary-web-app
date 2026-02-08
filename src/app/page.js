@@ -31,6 +31,7 @@ export default function Home() {
   useEffect(() => {
     
     setIsLoading(true);
+    closeKeyboard();
 
     if (!searchKeyword || searchKeyword.trim() === "" || searchKeyword.length < 2) {
       return; 
@@ -128,11 +129,7 @@ function Searchbar() {
         
         ... [&::-webkit-search-cancel-button]:appearance-none [&::-webkit-search-decoration]:appearance-none [&::-webkit-search-results-button]:appearance-none [&::-webkit-search-results-decoration]:appearance-none `} value={inputValue} onChange={(e) => {
           setInputValue(e.target.value);
-}} onKeyDown={(e) => {
-    if (e.key === 'Enter') {
-      e.currentTarget.blur(); // This dismisses the mobile keyboard
-    }
-  }}/>
+}} />
 
         <label htmlFor="search-bar" className="absolute right-0 top-0 h-full flex items-center justify-center px-6 cursor-pointer" >
             { (inputValue === '') ? (
@@ -324,6 +321,16 @@ function Toggle() {
       </label>
     </div>
   );
+}
+
+function closeKeyboard() {
+  // Find the currently focused element
+  const activeElement = document.activeElement;
+
+  // If the active element is an input or textarea, blur it (remove focus)
+  if (activeElement && activeElement.tagName === 'INPUT') {
+    activeElement.blur();
+  }
 }
 
 function NoDefinitionFound() {
